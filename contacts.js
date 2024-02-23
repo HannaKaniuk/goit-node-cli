@@ -11,8 +11,8 @@ export const listContacts = async () => {
 
 export const getContactById = async contactId => {
   const contacts = await listContacts();
-  const updatedContacts = contacts.find(contact => contact.id === contactId);
-  return updatedContacts || null;
+  const updatedContact = contacts.find(contact => contact.id === contactId);
+  return updatedContact || null;
 };
 
 export const addContact = async (name, email, phone) => {
@@ -25,11 +25,15 @@ export const addContact = async (name, email, phone) => {
 
 export const removeContact = async contactId => {
   const contacts = await listContacts();
-  const deletedContact = contacts.find(contact => contact.id === contactId);
+  const deletedContactIndex = contacts.findIndex(
+    contact => contact.id === contactId
+  );
 
-  if (deletedContact) {
-    const newContactList = contacts.filter(contact => contact.id !== contactId);
-    await writeFile(contactsPath, JSON.stringify(newContactList));
+  if (deletedContactIndex !== -1) {
+    const [deletedContact] = contacts.splice(deletedContactIndex, 1);
+    await writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+    return deletedContact;
   }
-  return deletedContact || null;
+
+  return null;
 };
